@@ -13,20 +13,21 @@ from malupdate import writer_to_txt
 #
 # input_dir = sys.argv[1]
 #
-ThRend_exe = "D:\\Study\\code_proj\\ThRend-master\\x64\\Release\\ThRend.exe"
+ThRend_exe = "D:\\Study\\code_proj\\ThRend-master\\x64\\Release\\fly.exe"
 index = 0
 res = subprocess.Popen(ThRend_exe)
 res.wait()
 
+
 class PSO:
 
     def __init__(self, D, N, M, p_low, p_up, v_low, v_high, w=1., c1=2., c2=2.):
-        self.w = w 
+        self.w = w
         self.c1 = c1  # 个体学习因子
         self.c2 = c2  # 群体学习因子
-        self.D = D  
-        self.N = N 
-        self.M = M  
+        self.D = D
+        self.N = N
+        self.M = M
         self.p_range = [p_low, p_up]  # 粒子位置的约束范围
         self.v_range = [v_low, v_high]  # 粒子速度的约束范围
         self.x = np.zeros((self.N, self.D))  # 所有粒子的位置
@@ -41,7 +42,7 @@ class PSO:
             for j in range(self.D):
                 self.x[i][j] = random.uniform(self.p_range[0][j], self.p_range[1][j])
                 self.v[i][j] = random.uniform(self.v_range[0], self.v_range[1])
-            print(f"已初始化 {i+1} in {self.N} 个粒子")
+            print(f"已初始化 {i + 1} in {self.N} 个粒子")
             self.p_best[i] = self.x[i]  # 保存个体历史最优位置，初始默认第0代为最优
             fit = self.fitness(self.p_best[i])
             self.p_bestFit[i] = fit  # 保存个体历史最优适应值
@@ -49,14 +50,14 @@ class PSO:
                 self.g_best = self.p_best[i]
                 self.g_bestFit = fit
 
-    def fitness(self, x):
-
+    @staticmethod
+    def fitness(x):
         (x1, x2) = x
         writer_to_txt(x1, x2)
         res_in = subprocess.Popen([ThRend_exe])
         res_in.wait()
-        image1 = 'apparent.png'
-        image2 = 'ThRend.png'
+        image1 = 'gray_fly.png'
+        image2 = '90.jpg'
         similarity = DHas_similarity(image1, image2)
         print('图片相似度：', similarity)
         return 1 - similarity
@@ -82,7 +83,7 @@ class PSO:
                     self.x[i][j] = self.p_range[1][j]
             # 更新个体和全局历史最优位置及适应值
             _fit = self.fitness(self.x[i])
-            print(f"已更新 {i+1} in {self.N} 个粒子, 第{iter_n}轮迭代")
+            print(f"已更新 {i + 1} in {self.N} 个粒子, 第{iter_n + 1}轮迭代")
             if _fit < self.p_bestFit[i]:
                 self.p_best[i] = self.x[i]
                 self.p_bestFit[i] = _fit
@@ -90,27 +91,27 @@ class PSO:
                 self.g_best = self.x[i].copy()
                 self.g_bestFit = _fit
 
-    def pso(self, draw=1):
-        best_fit = []  
+    def run(self, draw=1):
+        best_fit = []
         w_range = None
         if isinstance(self.w, tuple):
             w_range = self.w[1] - self.w[0]
             self.w = self.w[1]
-        time_start = time.time() 
+        time_start = time.time()
         for i in range(self.M):
-            self.update(i)  
+            self.update(i)
             if w_range:
-                self.w -= w_range / self.M  
+                self.w -= w_range / self.M
             print("\rIter: {:d}/{:d} fitness: {:.4f} ".format(i, self.M, self.g_bestFit, end='\n'))
-            destination_path = os.path.join("D:\\Study\\code_proj\\ThRend-master\\outs\\iter", str(i+1) + ".png")
+            destination_path = os.path.join("D:\\Study\\code_proj\\ThRend-master\\outs\\iter", str(i + 1) + ".png")
             try:
-                shutil.copy("D:\\Study\\code_proj\\ThRend-master\\outs\\apparent.png", destination_path)
+                shutil.copy("D:\\Study\\code_proj\\ThRend-master\\outs\\gray_fly.png", destination_path)
                 print(f"成功复制并重命名图片为: {destination_path}")
             except Exception as e:
                 print(f"复制或重命名文件时出错: {e}")
-            best_fit.append(self.g_bestFit.copy())
-        time_end = time.time()  
-        print(f'Algorithm takes {time_end - time_start} seconds')  
+            best_fit.append(self.g_bestFit)
+        time_end = time.time()
+        print(f'Algorithm takes {time_end - time_start} seconds')
         if draw:
             print(best_fit)
             plt.figure()
@@ -124,5 +125,5 @@ class PSO:
 if __name__ == '__main__':
     low = [0.5, 0.5]
     up = [1.0, 1.0]
-    pso = PSO(2, 70, 20, low, up, -0.5, 0.5, w=0.9)
-    pso.pso()
+    pso = PSO(2, 70, 30, low, up, -0.5, 0.5, w=0.9)
+    pso.run()

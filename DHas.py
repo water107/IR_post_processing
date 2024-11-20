@@ -79,7 +79,7 @@ def DHas_similarity(pic1, pic2):
     return similarity
 
 if __name__ == "__main__":
-    image_file1 = '8.png'
-    image_file2 = '0.jpg'
+    image_file1 = 'gray_fly.png'
+    image_file2 = '60.jpg'
     print(DHas_similarity(image_file1, image_file2))
 

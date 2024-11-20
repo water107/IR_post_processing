@@ -1,11 +1,11 @@
-materials_txt = "D:\\Study\\code_proj\\ThRend-master\\materials.txt"
+materials_txt = "D:\\Study\\code_proj\\ThRend-master\\flymaterials.txt"
 
 def writer_to_txt(emissivity1, diffuse1):
     with open(materials_txt, 'r', encoding='utf-8') as file:
         lines = file.readlines()
 
     for i, line in enumerate(lines):
-        if line.strip() == "name mortar":
+        if line.strip() == "name steel":
             emissivity_parts = lines[i + 2].split()
             emissivity_parts[-1] = str(emissivity1)
             lines[i + 2] = " ".join(emissivity_parts) + "\n"
